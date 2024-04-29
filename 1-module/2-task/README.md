@@ -18,12 +18,8 @@ function print(text) {
  * @returns {boolean}
  */
 function isValid(name) {
-    if (name === null || name === "" || name === "null") return false;
-    if (name.includes(" ")) return false;
-    if (name.length < 4) return false
-    
-    return true;
-  }
+  // Ваш код
+}
 
 /**
  * Эту функцию трогать не нужно
