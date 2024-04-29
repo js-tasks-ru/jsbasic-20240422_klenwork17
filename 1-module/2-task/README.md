@@ -18,7 +18,7 @@ function print(text) {
  * @returns {boolean}
  */
 function isValid(name) {
-    if (name === null || name === "") return false;
+    if (name === null || name === "" || name === "null") return false;
     if (name.includes(" ")) return false;
     if (name.length < 4) return false
     
