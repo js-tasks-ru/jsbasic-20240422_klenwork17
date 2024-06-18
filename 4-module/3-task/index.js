@@ -1,9 +1,10 @@
 let table = document.querySelector('.js-teachers');
 
 function highlight(table){
+    
     let tbody = table.querySelector('tbody');
     let rows = tbody.rows;   // body's rows
-
+    
     for(let row of rows){
         // Third column action
         if(row.querySelector('[data-available="true"]')){
@@ -31,4 +32,4 @@ function highlight(table){
      
 }
 
-highlight()
+
