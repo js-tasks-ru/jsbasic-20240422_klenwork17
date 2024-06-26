@@ -1,4 +1,4 @@
-let table = document.querySelector('.js-teachers');
+
 
 function highlight(table){
     
