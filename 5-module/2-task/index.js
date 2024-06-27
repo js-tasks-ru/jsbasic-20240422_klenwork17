@@ -1,3 +1,8 @@
 function toggleText() {
-  // ваш код...
+  
+  btn.addEventListener('click', function() {
+    text.hidden = !text.hidden
+  }) 
+  
 }
+
