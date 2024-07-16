@@ -1,88 +1,66 @@
-/**
- * Компонент, который реализует таблицу
- * с возможностью удаления строк
- *
- * Пример одного элемента, описывающего строку таблицы
- *
- *      {
- *          name: 'Ilia',
- *          age: 25,
- *          salary: '1000',
- *          city: 'Petrozavodsk'
- *      }
- *
- */
 export default class UserTable {
-  constructor(rows){
-      this.rows = rows;
-      this.elem = this.table();
-  }
+    constructor(rows) {
+        this.rows = rows;
+        this.elem = this.element();
+    } 
+    
+    element() {
+        const table = document.createElement('table');
+        // document.body.append(table);
 
-  table() {
-      const table = document.createElement('table');
-      const BODY = document.body
+        // Шапка таблицы
+        
+        const thead = document.createElement('thead');
+        table.append(thead);
+        
+        const headerRow = document.createElement('tr');
+        thead.append(headerRow)
+        
+        Object.keys(this.rows[0]).forEach(function(item){
+            const th = document.createElement('th');
+            th.textContent = item;
 
-      BODY.append(table);
-      
-      // Создание шапки таблицы
+            headerRow.append(th);
+        })
 
-      const thead = document.createElement('thead');
-      table.append(thead)
+        // Тело таблицы 
 
-      const headerRow = document.createElement('tr'); 
-      thead.append(headerRow)
+        const tbody = document.createElement('tbody');
+        table.append(tbody);
 
-      Object.keys(this.rows[0]).forEach(function(item){
-          const th = document.createElement('th');
-          th.textContent = item;
+        this.rows.forEach(function(item) {
+            const tr = document.createElement('tr');
 
-          headerRow.append(th)
+            for(let key in item){
+                const td = document.createElement('td');
+                td.innerHTML = item[key];
 
-      })
-      const th = document.createElement('th');
-      headerRow.append(th)
+                tr.append(td);
+            }
 
+            const buttonTd = document.createElement('td');
+            tr.append(buttonTd);
 
-      // Создание Тела таблицы
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'X';
+            deleteButton.id = 'deleteButton';
 
-      const tbody = document.createElement('tbody');
-      table.append(tbody);
+            buttonTd.append(deleteButton);
 
-      // Для каждого объекта массива создаём строку, заполняем её количеством ячеек, 
-      // которое равно количеству свойств. Содержимое ячеек - значение свойства
+            // Обработчики 
 
-      this.rows.forEach(function(item){
-          const tr = document.createElement('tr');
+            deleteButton.addEventListener('click', function(event){
+                deleteButton.closest('tr').remove();
+            })
 
-          for(let key in item){
-              const td = document.createElement('td');
-              td.textContent = item[key];
+            tbody.append(tr);
 
-              tr.append(td);
-          }
+        
+        })
 
-          const tdButtonContainer = document.createElement('td'); // ячейка для кнпоки
-          tr.append(tdButtonContainer)
-
-          const deleteButton = document.createElement('button');    
-          deleteButton.className = 'btn';
-          deleteButton.textContent = '[x]';   
-
-          tdButtonContainer.append(deleteButton);
-
-          // Обработчики
-
-          deleteButton.addEventListener('click', function(event){
-              deleteButton.closest('tr').remove()   
-          })  
-          
-          tbody.append(tr);
-          
-      })
-  }
+        return table;
+    }
 }
-
-
 
 
 
