@@ -8,6 +8,7 @@ export default class ProductCard {
     this.addEventListeners();
   }
 
+
   render() {
     this.elem = createElement(`<div class="card">
       <div class="card__top">
