@@ -45,7 +45,7 @@ export default class RibbonMenu {
     this.elem.onclick = (event) => {
       
       if(target) {
-        target.classList.remove('ribbon__item_active')
+        target.classList.remove('ribbon__item_active');
       }
       
       let link = event.target.closest('.ribbon__item');
@@ -60,7 +60,7 @@ export default class RibbonMenu {
           detail: id, 
           bubbles: true 
         }));
-        
+
         event.preventDefault()
       }
       
