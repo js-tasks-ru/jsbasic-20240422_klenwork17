@@ -28,7 +28,7 @@ export default class StepSlider {
 
       for(let i = 0; i < this.steps; i++) {
         let step = createElement(`<span data-number="${i}"></span>`);
-        steps.append(step); 
+        steps.append(step);       
       }
 
       steps.firstElementChild.classList.add('slider__step-active');
@@ -74,6 +74,6 @@ export default class StepSlider {
 
       thumb.style.left = `${leftPercents}%`;
       progress.style.width = `${leftPercents}%`;
-    }
+    } 
     
 }
