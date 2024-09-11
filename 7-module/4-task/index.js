@@ -149,5 +149,4 @@ export default class StepSlider {
       thumb.style.left = `${leftPercents}%`;
       progress.style.width = `${leftPercents}%`;
     } 
-    
 }
