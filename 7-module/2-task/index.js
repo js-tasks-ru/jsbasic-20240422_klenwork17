@@ -27,7 +27,6 @@ export default class Modal {
   sub(ref) {
     return this.elem.querySelector(`.modal__${ref}`);
   }
-
   open() {
     document.body.append(this.elem);
     document.body.classList.add('is-modal-open');
