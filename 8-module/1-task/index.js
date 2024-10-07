@@ -42,20 +42,25 @@ export default class CartIcon {
     if (!this.elem.classList.contains('cart-icon_visible')) return;
     if (window.innerWidth <= 767) return;  
 
-    let coords = this.elem.getBoundingClientRect();
-    let container = document.getElementsByClassName('container')[0];
-    let containerFirstElemCoords = container.firstElementChild.getBoundingClientRect();
+    let leftIndent = Math.min(document.querySelector('.container').getBoundingClientRect().right + 20, document.documentElement.clientWidth - this.elem.offsetWidth - 10) + 'px';
 
-
-    if (window.scrollY > 50 && window.scrollY > coords.top) {
-      this.elem.style.position = 'fixed';
-      this.elem.style.left = `${containerFirstElemCoords.right + 20}px`
-
+    if (window.scrollY > 50) {
+        Object.assign(this.elem.style, {
+          position: 'fixed',
+          left: leftIndent,
+          zIndex: 100,
+        })   
     } else {
-      this.elem.style.position = "";
-      this.elem.style.left = "";
+      Object.assign(this.elem.style, {
+        position: '',
+        left: '',
+        zIndex: '',
+      }) 
     }
-  
   }
+
+  
 }
+
+
 
