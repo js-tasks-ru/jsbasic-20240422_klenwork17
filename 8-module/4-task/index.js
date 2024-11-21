@@ -1,33 +1,24 @@
 import createElement from '../../assets/lib/create-element.js';
 import escapeHtml from '../../assets/lib/escape-html.js';
-
 import Modal from '../../7-module/2-task/index.js';
-
 export default class Cart {
   cartItems = []; // [product: {...}, count: N]
-
   constructor(cartIcon) {
     this.cartIcon = cartIcon;
-
     this.addEventListeners();
-    this.onClickListener = this.onClickListener.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
   }
 
   addProduct(product) {
-    if (!product) return;
-
-    let newProduct = {
-      product: product,
-      count: 1
-    }
-
+    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
     let cartItem = this.cartItems.find(
-      cartItem => cartItem.product.id === newProduct.product.id
+      item => item.product.id == product.id
     );
-
     if (!cartItem) {
-      this.cartItems.push(newProduct);
+      cartItem = {
+        product,
+        count: 1
+      };
+      this.cartItems.push(cartItem);
     } else {
       cartItem.count++;
     }
@@ -36,31 +27,33 @@ export default class Cart {
   }
 
   updateProductCount(productId, amount) {
-    let cartItem = this.cartItems.find((cartItem) => cartItem.product.id === productId);
-    if (!cartItem) return;
+    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+    let cartItem = this.cartItems.find(item => item.product.id == productId);
+    cartItem.count += amount;
 
-    if (amount === 1) cartItem.count++;  
-    else if (amount === -1) cartItem.count--;
-
-    if (cartItem.count === 0) {
-      let emptyProductIndex = this.cartItems.indexOf(cartItem);
-      this.cartItems.splice(emptyProductIndex, 1);
+    if (cartItem.count == 0) {
+      this.cartItems.splice(this.cartItems.indexOf(cartItem), 1);
     }
-  
+
     this.onProductUpdate(cartItem);
   }
 
   isEmpty() {
+    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
     return this.cartItems.length === 0;
   }
 
-  getTotalCount() {   
-    return this.cartItems.reduce((sum, cartItem) => sum + cartItem.count, 0);
+  getTotalCount() {
+    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+    return this.cartItems.reduce((sum, item) => sum + item.count, 0);
   }
 
   getTotalPrice() {
-    return this.cartItems.reduce((currentSum, cartItem) => currentSum + (cartItem.product.price * cartItem.count), 0);
-    
+    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+    return this.cartItems.reduce(
+      (sum, item) => sum + item.product.price * item.count,
+      0
+    );
   }
 
   renderProduct(product, count) {
@@ -88,7 +81,6 @@ export default class Cart {
       </div>
     </div>`);
   }
-
   renderOrderForm() {
     return createElement(`<form class="cart-form">
       <h5 class="cart-form__title">Delivery</h5>
@@ -107,7 +99,7 @@ export default class Cart {
             <span class="cart-buttons__info-price">€${this.getTotalPrice().toFixed(
               2
             )}</span>
-          </div>  
+          </div>
           <button type="submit" class="cart-buttons__button btn-group__button button">order</button>
         </div>
       </div>
@@ -115,69 +107,68 @@ export default class Cart {
   }
 
   renderModal() {
+    // ...ваш код
     this.modal = new Modal();
-    this.modal.setTitle('Your order');
 
-    this.modalBody = document.createElement('div'); 
-    let orderedProducts = this.cartItems.map(
-      item => this.renderProduct(item.product, item.count)
-    );
-    let orderForm = this.renderOrderForm();
-    
-    this.modalBody.append(...orderedProducts, orderForm);
-    this.modal.setBody(this.modalBody); 
-    this.modal.open(); 
+    this.modal.setTitle("Your order");
 
-    document.removeEventListener('click', this.onClickListener)
-    document.addEventListener('click', this.onClickListener);
-    
-    orderForm.removeEventListener('submit', this.onSubmit);
-    orderForm.addEventListener('submit', this.onSubmit);
-    
-  }
+    this.modalBody = document.createElement(`div`);
 
-  onClickListener(event) {
-    let cartCounterButton = event.target.closest('.cart-counter__button');
-    if (!cartCounterButton) return;
-
-    let productId = event.target.closest('[data-product-id]').dataset.productId; 
-
-    if (cartCounterButton.classList.contains('cart-counter__button_plus')) {
-      this.updateProductCount(productId, 1);
+    for (let { product, count } of this.cartItems) {
+      this.modalBody.append(this.renderProduct(product, count));
     }
-    if(cartCounterButton.classList.contains('cart-counter__button_minus')) {
-      this.updateProductCount(productId, -1);
-    } 
+
+    this.modalBody.append(this.renderOrderForm());
+
+    this.modalBody.addEventListener("click", this.onModalBodyClick);
+
+    this.modalBody.querySelector("form").onsubmit = (event) => this.onSubmit(event);
+
+    this.modal.setBody(this.modalBody);
+
+    // when modal is closed, we forget about it, don't update it any more
+    this.modal.elem.addEventListener('modal-close', () => {
+      this.modal = null;
+      this.modalBody = null;
+    });
+
+    this.modal.open();
   }
-  
 
+  onModalBodyClick = (event) => {
+    if (event.target.closest(".cart-counter__button")) {
+      let productElem = event.target.closest("[data-product-id]");
+      let productId = productElem.dataset.productId;
+      this.updateProductCount(
+        productId,
+        event.target.closest(".cart-counter__button_plus") ? 1 : -1
+      );
+    }
+  };
 
-
-  onProductUpdate(cartItem) {
+  onProductUpdate({product, count}) {
     this.cartIcon.update(this);
 
     if (!this.modal || !document.body.classList.contains('is-modal-open')) {
       return;
     }
 
-    if (this.isEmpty()) {
+    if (this.cartItems.length == 0) {
+      // No products, close the modal
       this.modal.close();
       return;
     }
-    this.modalBody = document.querySelector('.modal__body div');
 
-    let productId = cartItem.product.id;
+    if (count == 0) {
+      this.modalBody.querySelector(`[data-product-id="${product.id}"]`).remove();
+    } else {
+      this.modalBody.querySelector(`[data-product-id="${product.id}"] .cart-counter__count`).innerHTML = count;
 
-    this.modalBody.querySelector(`[data-product-id="${productId}"] .cart-counter__count`).innerHTML = cartItem.count;
-    
-    this.modalBody.querySelector(`[data-product-id="${productId}"] .cart-product__price`).innerHTML = `€${(cartItem.product.price * cartItem.count).toFixed(2)}`;
+      this.modalBody.querySelector(`[data-product-id="${product.id}"] .cart-product__price`).innerHTML = '€' + (count * product.price).toFixed(2);
+    }
 
-    this.modalBody.querySelector(`.cart-buttons__info-price`).innerHTML = `€${this.getTotalPrice().toFixed(2)}`;
-    
-    
-
+    this.modalBody.querySelector(`.cart-buttons__info-price`).innerHTML = '€' + this.getTotalPrice().toFixed(2);
   }
-
   async onSubmit(event) {
     event.preventDefault();
 
@@ -212,9 +203,3 @@ export default class Cart {
     this.cartIcon.elem.onclick = () => this.renderModal();
   }
 }
-
-
-// Остались onSubmit 
-
-
-// решить проблему с привязкой bind
