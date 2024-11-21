@@ -10,26 +10,57 @@ export default class Cart {
     this.cartIcon = cartIcon;
 
     this.addEventListeners();
+    this.onClickListener = this.onClickListener.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
   }
 
   addProduct(product) {
-    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+    if (!product) return;
+
+    let newProduct = {
+      product: product,
+      count: 1
+    }
+
+    let cartItem = this.cartItems.find(
+      cartItem => cartItem.product.id === newProduct.product.id
+    );
+
+    if (!cartItem) {
+      this.cartItems.push(newProduct);
+    } else {
+      cartItem.count++;
+    }
+
+    this.onProductUpdate(cartItem);
   }
 
   updateProductCount(productId, amount) {
-    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+    let cartItem = this.cartItems.find((cartItem) => cartItem.product.id === productId);
+    if (!cartItem) return;
+
+    if (amount === 1) cartItem.count++;  
+    else if (amount === -1) cartItem.count--;
+
+    if (cartItem.count === 0) {
+      let emptyProductIndex = this.cartItems.indexOf(cartItem);
+      this.cartItems.splice(emptyProductIndex, 1);
+    }
+  
+    this.onProductUpdate(cartItem);
   }
 
   isEmpty() {
-    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+    return this.cartItems.length === 0;
   }
 
-  getTotalCount() {
-    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+  getTotalCount() {   
+    return this.cartItems.reduce((sum, cartItem) => sum + cartItem.count, 0);
   }
 
   getTotalPrice() {
-    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+    return this.cartItems.reduce((currentSum, cartItem) => currentSum + (cartItem.product.price * cartItem.count), 0);
+    
   }
 
   renderProduct(product, count) {
@@ -76,7 +107,7 @@ export default class Cart {
             <span class="cart-buttons__info-price">€${this.getTotalPrice().toFixed(
               2
             )}</span>
-          </div>
+          </div>  
           <button type="submit" class="cart-buttons__button btn-group__button button">order</button>
         </div>
       </div>
@@ -84,17 +115,97 @@ export default class Cart {
   }
 
   renderModal() {
-    // ...ваш код
+    this.modal = new Modal();
+    this.modal.setTitle('Your order');
+
+    this.modalBody = document.createElement('div'); 
+    let orderedProducts = this.cartItems.map(
+      item => this.renderProduct(item.product, item.count)
+    );
+    let orderForm = this.renderOrderForm();
+    
+    this.modalBody.append(...orderedProducts, orderForm);
+    this.modal.setBody(this.modalBody); 
+    this.modal.open(); 
+
+    document.removeEventListener('click', this.onClickListener)
+    document.addEventListener('click', this.onClickListener);
+    
+    orderForm.removeEventListener('submit', this.onSubmit);
+    orderForm.addEventListener('submit', this.onSubmit);
+    
   }
+
+  onClickListener(event) {
+    let cartCounterButton = event.target.closest('.cart-counter__button');
+    if (!cartCounterButton) return;
+
+    let productId = event.target.closest('[data-product-id]').dataset.productId; 
+
+    if (cartCounterButton.classList.contains('cart-counter__button_plus')) {
+      this.updateProductCount(productId, 1);
+    }
+    if(cartCounterButton.classList.contains('cart-counter__button_minus')) {
+      this.updateProductCount(productId, -1);
+    } 
+  }
+  
+
+
 
   onProductUpdate(cartItem) {
-    // ...ваш код
-
     this.cartIcon.update(this);
+
+    if (!this.modal || !document.body.classList.contains('is-modal-open')) {
+      return;
+    }
+
+    if (this.isEmpty()) {
+      this.modal.close();
+      return;
+    }
+    this.modalBody = document.querySelector('.modal__body div');
+
+    let productId = cartItem.product.id;
+
+    this.modalBody.querySelector(`[data-product-id="${productId}"] .cart-counter__count`).innerHTML = cartItem.count;
+    
+    this.modalBody.querySelector(`[data-product-id="${productId}"] .cart-product__price`).innerHTML = `€${(cartItem.product.price * cartItem.count).toFixed(2)}`;
+
+    this.modalBody.querySelector(`.cart-buttons__info-price`).innerHTML = `€${this.getTotalPrice().toFixed(2)}`;
+    
+    
+
   }
 
-  onSubmit(event) {
-    // ...ваш код
+  async onSubmit(event) {
+    event.preventDefault();
+
+    this.modalBody
+      .querySelector('button[type="submit"]')
+      .classList.add("is-loading");
+    let form = this.modalBody.querySelector('.cart-form');
+    let userData = new FormData(form);
+
+    await fetch('https://httpbin.org/post', { method: 'POST', body: userData });
+
+    this.modal.setTitle("Success!");
+    this.modalBody
+      .querySelector('button[type="submit"]')
+      .classList.remove("is-loading");
+
+    this.cartItems = [];
+    this.cartIcon.update(this);
+
+    this.modalBody.innerHTML = `
+      <div class="modal__body-inner">
+        <p>
+          Order successful! Your order is being cooked :) <br>
+          We’ll notify you about delivery time shortly.<br>
+          <img src="/assets/images/delivery.gif">
+        </p>
+      </div>
+      `;
   };
 
   addEventListeners() {
@@ -102,3 +213,8 @@ export default class Cart {
   }
 }
 
+
+// Остались onSubmit 
+
+
+// решить проблему с привязкой bind
