@@ -21,7 +21,7 @@ export default class Cart {
       existingProduct.count++;
     }
 
-    this.onProductUpdate(this.cartItems); // обновление корзины
+    this.onProductUpdate(this.cartItems);
   }
 
   updateProductCount(productId, amount) {
@@ -54,7 +54,7 @@ export default class Cart {
 
   onProductUpdate(cartItem) {
 
-    this.cartIcon.update(this); // обновление корзины
+    this.cartIcon.update(this); 
   }
 }
 

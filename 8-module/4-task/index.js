@@ -1,18 +1,15 @@
 import createElement from '../../assets/lib/create-element.js';
 import escapeHtml from '../../assets/lib/escape-html.js';
-
 import Modal from '../../7-module/2-task/index.js';
-
 export default class Cart {
   cartItems = []; // [product: {...}, count: N]
-
   constructor(cartIcon) {
     this.cartIcon = cartIcon;
-
     this.addEventListeners();
   }
 
   addProduct(product) {
+    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
     let cartItem = this.cartItems.find(
       item => item.product.id == product.id
     );
@@ -30,6 +27,7 @@ export default class Cart {
   }
 
   updateProductCount(productId, amount) {
+    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
     let cartItem = this.cartItems.find(item => item.product.id == productId);
     cartItem.count += amount;
 
@@ -41,14 +39,17 @@ export default class Cart {
   }
 
   isEmpty() {
+    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
     return this.cartItems.length === 0;
   }
 
   getTotalCount() {
+    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
     return this.cartItems.reduce((sum, item) => sum + item.count, 0);
   }
 
   getTotalPrice() {
+    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
     return this.cartItems.reduce(
       (sum, item) => sum + item.product.price * item.count,
       0
@@ -80,7 +81,6 @@ export default class Cart {
       </div>
     </div>`);
   }
-
   renderOrderForm() {
     return createElement(`<form class="cart-form">
       <h5 class="cart-form__title">Delivery</h5>
@@ -107,6 +107,7 @@ export default class Cart {
   }
 
   renderModal() {
+    // ...ваш код
     this.modal = new Modal();
 
     this.modal.setTitle("Your order");
@@ -168,7 +169,6 @@ export default class Cart {
 
     this.modalBody.querySelector(`.cart-buttons__info-price`).innerHTML = '€' + this.getTotalPrice().toFixed(2);
   }
-
   async onSubmit(event) {
     event.preventDefault();
 
